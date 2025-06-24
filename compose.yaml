@@ -1,0 +1,38 @@
+services: 
+  backend:
+    build:
+      context: ./backend  # the folder to use for building ( . -> current directory )
+      dockerfile: dev.Dockerfile   # Which Dockerfile to use
+    ports:
+      - "8080:8000"  # Map ports
+    command: uvicorn main:pyapp --host 0.0.0.0 --port 8000 
+    environment:
+      - PORT=8000
+    env_file:
+      - .env.sample
+    volumes:
+      - ./backend/src:/app  
+    develop:
+      watch:
+        - action: rebuild
+          path: backend/requirements.txt
+        - action: rebuild
+          path: backend/dev.Dockerfile
+        - action: restart
+          path: backend/src/
+          #target: /app
+
+  static_html:
+  # Option 1: Use existing image from Docker Hub
+    #image: python:3.14.0b3-alpine3.21
+  # Option 2: Build your own image (what you're doing)
+    build:
+      context: ./static_html   # the folder to use for building ( . -> current directory )
+      dockerfile: static.Dockerfile   # Which Dockerfile to use
+    ports:
+      - "8000:8000"  # Map ports
+      - "3000:3000"  # Map additional port
+    command: python -m http.server 8000
+    volumes:
+      - ./static_html/src:/app  
+

@@ -1,0 +1,3 @@
+# Ignore files and directories that should not be included in the Docker image
+backend\src\ignoreme\test.txt
+
