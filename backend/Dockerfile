@@ -1,6 +1,13 @@
 # Switch from Alpine to Debian which handles this better
 FROM python:3.13.4-slim-bullseye
 
+# host.docker.internal is used to access the host machine from the container 
+# instead of using the default gateway localhost 
+
+
+# curl -X POST -d '{"message": "Hello, world!"}' -H "Content-Type: application/json" http://host.docker.internal:8000/api/chat/
+RUN apt-get update && apt-get install -y curl
+
 
 # Create a python virtual environment (isolate python from the system)
 RUN python3 -m venv /opt/venv

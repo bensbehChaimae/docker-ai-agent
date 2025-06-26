@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: ./backend  # the folder to use for building ( . -> current directory )
-      dockerfile: dev.Dockerfile   # Which Dockerfile to use
+      dockerfile: Dockerfile   # Which Dockerfile to use
     ports:
       - "8080:8000"  # Map ports
     command: uvicorn main:pyapp --host 0.0.0.0 --port 8000 
@@ -12,6 +12,8 @@ services:
       - .env.sample
     volumes:
       - ./backend/src:/app  
+    depends_on:
+      - db_service
     develop:
       watch:
         - action: rebuild
@@ -22,17 +24,40 @@ services:
           path: backend/src/
           #target: /app
 
-  static_html:
-  # Option 1: Use existing image from Docker Hub
-    #image: python:3.14.0b3-alpine3.21
-  # Option 2: Build your own image (what you're doing)
-    build:
-      context: ./static_html   # the folder to use for building ( . -> current directory )
-      dockerfile: static.Dockerfile   # Which Dockerfile to use
-    ports:
-      - "8000:8000"  # Map ports
-      - "3000:3000"  # Map additional port
-    command: python -m http.server 8000
-    volumes:
-      - ./static_html/src:/app  
 
+
+  # DATABASE_URL= postresql+psycopg://user:password@host:port/dbname
+  db_service:
+    image: postgres:17.5
+    ports:
+      - 5432:5432 
+    environment:
+      - POSTGRES_USER=dc_user
+      - POSTGRES_PASSWORD=dc_password
+      - POSTGRES_DB=dc_db
+    #env_file:
+    #- .env.sample-db
+    volumes:
+      - dc_managed_db_volume:/var/lib/postgresql/data
+
+
+
+  # static_html:
+  # # Option 1: Use existing image from Docker Hub
+  #   #image: python:3.14.0b3-alpine3.21
+  # # Option 2: Build your own image (what you're doing)
+  #   build:
+  #     context: ./static_html   # the folder to use for building ( . -> current directory )
+  #     dockerfile: static.Dockerfile   # Which Dockerfile to use
+  #   ports:
+  #     - "8000:8000"  # Map ports
+  #     - "3000:3000"  # Map additional port
+  #   command: python -m http.server 8000
+  #   volumes:
+  #     - ./static_html/src:/app  
+
+
+volumes:
+  dc_managed_db_volume:
+
+   

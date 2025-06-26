@@ -1,3 +1,13 @@
 # Ignore files and directories that should not be included in the Docker image
 backend\src\ignoreme\test.txt
 
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.db
+node_modules/
+dist/
+build/
+*.log
+*.sqlite
